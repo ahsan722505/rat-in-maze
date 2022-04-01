@@ -1,0 +1,23 @@
+:root{
+    --cell-dim : 35px;
+}
+.cell{
+    width: var(--cell-dim);
+    height: var(--cell-dim);
+    display: inline-block;
+    outline: 1px solid brown;
+}
+.cell img{
+    width: var(--cell-dim);
+  height: var(--cell-dim);
+  object-fit: contain;
+}
+.maze{
+    outline: 2px solid brown;
+}
+.row{
+    height: var(--cell-dim);
+}
+.block{
+    background-color: black;
+}
