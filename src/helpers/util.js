@@ -28,3 +28,15 @@ export const getMazeSize=(width)=>{
     return 8;
     
 }
+export const getRatCoords=(prevCoords,direction)=>{
+    switch (direction) {
+        case 'D':
+            return [prevCoords[0]+1,prevCoords[1]];
+        case 'L':
+            return [prevCoords[0],prevCoords[1]-1];
+        case 'R':
+            return [prevCoords[0],prevCoords[1]+1];
+        default:
+            return [prevCoords[0]-1,prevCoords[1]];
+    }
+}

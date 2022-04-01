@@ -3,11 +3,16 @@ import { useState,useRef } from 'react'
 import { CreateMaze, generateVisitedArray, getMazeSize } from '../helpers/util';
 import styles from "./Maze.module.css";
 import rat from "../assets/rat.jpeg";
+import { getRatCoords } from '../helpers/util';
 const Maze = () => {
     const pathsRef=useRef([]);
     const visitedRef=useRef(generateVisitedArray(getMazeSize(window.innerWidth)));
     const [maze,setMaze]=useState(CreateMaze(getMazeSize(window.innerWidth)));
     const [ratCoord,setRatCoord]=useState([0,0]);
+    const intervalRef=useRef(null);
+    useEffect(()=>{
+        if(ratCoord[0] === maze.length -1 && ratCoord[1] === maze.length -1) clearInterval(intervalRef.current);
+    },[ratCoord]);
     const createBlock=(row,col)=>{
         if(row === 0 && col === 0 || row === maze.length -1 && col === maze.length -1) return;
         // deep copying maze
@@ -44,12 +49,6 @@ const Maze = () => {
             goAhead(x+1,y,path);
             path=path.slice(0,-1);
         }
-        // left
-        if(isSafe(x,y-1)){
-            path=path.concat('L');
-            goAhead(x,y-1,path);
-            path=path.slice(0,-1);
-        }
         // right
         if(isSafe(x,y+1)){
             path=path.concat('R');
@@ -62,12 +61,26 @@ const Maze = () => {
             goAhead(x-1,y,path);
             path=path.slice(0,-1);
         }
+        // left
+        if(isSafe(x,y-1)){
+            path=path.concat('L');
+            goAhead(x,y-1,path);
+            path=path.slice(0,-1);
+        }
         visitedRef.current[x][y]=0;
+    }
+    const moveRat=()=>{
+        const id=setInterval(()=>{
+            setRatCoord(state=> getRatCoords(state,pathsRef.current[0][0]));
+            pathsRef.current[0]=pathsRef.current[0].slice(1);
+        },100);
+        intervalRef.current=id;
     }
   return (
       <>
         <button style={{marginBottom : "1rem"}} onClick={()=> {
             goAhead(0,0,"");
+            moveRat();
     console.log(pathsRef.current);}}>let me go</button>
         <div className={styles.maze}>
             {maze.map((eachRow,rowInd)=>{
