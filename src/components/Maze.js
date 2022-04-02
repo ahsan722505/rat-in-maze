@@ -4,16 +4,29 @@ import { CreateMaze, generateVisitedArray, getMazeSize } from '../helpers/util';
 import styles from "./Maze.module.css";
 import rat from "../assets/rat.jpeg";
 import { getRatCoords } from '../helpers/util';
-const Maze = () => {
+const Maze = ({showModal}) => {
     const pathsRef=useRef([]);
+    const counterRef=useRef(0);
     const visitedRef=useRef(generateVisitedArray(getMazeSize(window.innerWidth)));
     const [maze,setMaze]=useState(CreateMaze(getMazeSize(window.innerWidth)));
     const [ratCoord,setRatCoord]=useState([0,0]);
+    const [interactionMode,setInteractionMode]=useState(true);
     const intervalRef=useRef(null);
     useEffect(()=>{
         if(ratCoord[0] === maze.length -1 && ratCoord[1] === maze.length -1) clearInterval(intervalRef.current);
     },[ratCoord]);
+    const reset=()=>{
+        pathsRef.current=[];
+        counterRef.current=0;
+        visitedRef.current=generateVisitedArray(maze.length);
+        setMaze(CreateMaze(maze.length));
+        setInteractionMode(true);
+        setRatCoord([0,0]);
+        clearInterval(intervalRef.current);
+        intervalRef.current=null;
+    }
     const createBlock=(row,col)=>{
+        if(!interactionMode) return;
         if(row === 0 && col === 0 || row === maze.length -1 && col === maze.length -1) return;
         // deep copying maze
         let newMaze=[];
@@ -29,13 +42,14 @@ const Maze = () => {
         setMaze(newMaze);
     }
     const isSafe=(x,y)=>{
-        if(x >= 0 && x< maze.length && y >= 0 && y < maze.length && maze[x][y] === 1 && visitedRef.current[x][y] === 0 && pathsRef.current.length === 0){
+        if(x >= 0 && x< maze.length && y >= 0 && y < maze.length && maze[x][y] === 1 && visitedRef.current[x][y] === 0 && pathsRef.current.length === 0 && counterRef.current<100000){
             
             return true;
         }
         return false;
     }
     const goAhead=(x,y,path)=>{
+        counterRef.current++;
         
         if(x == maze.length-1 && y == maze.length - 1 ){
             
@@ -78,10 +92,18 @@ const Maze = () => {
     }
   return (
       <>
-        <button style={{marginBottom : "1rem"}} onClick={()=> {
+        <button className={styles.btn} style={{transform : "translateX(-50%)"}} onClick={reset}>reset</button>
+        <button className={styles.btn} style={{ marginBottom : ".5rem",transform : "translateX(50%)"}} onClick={()=> {
+            if(!interactionMode) return;
+            setInteractionMode(false);
             goAhead(0,0,"");
+            console.log(counterRef.current);
+            if(pathsRef.current.length === 0){
+                showModal(<h2 style={{margin : "1rem" , color : "brown"}}>oops! unable to find any path.</h2>)
+                return;
+            }
             moveRat();
-    console.log(pathsRef.current);}}>let me go</button>
+    }}>go rat</button>
         <div className={styles.maze}>
             {maze.map((eachRow,rowInd)=>{
                 return(

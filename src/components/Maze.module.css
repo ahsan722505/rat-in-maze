@@ -21,3 +21,12 @@
 .block{
     background-color: black;
 }
+.btn{
+    padding: .5rem 1rem;
+    border: none;
+    background-color: brown;
+    color : white;
+    border-radius: .5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
